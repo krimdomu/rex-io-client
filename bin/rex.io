@@ -15,7 +15,7 @@ use Data::Dumper;
 getopts(
    help => \&help,
    dump => sub {
-      my $client = Rex::IO::Client->new();
+      my $client = Rex::IO::Client->new;
       $client->dump;
    },
    get => sub {
@@ -27,9 +27,14 @@ getopts(
       }
       print Dump({ cmdb_get($key) });
    },
+   "server-get" => sub {
+      my ($server) = @_;
+      my $client = Rex::IO::Client->new;
+      print Dump($client->get_server($server));
+   },
    "server-add" => sub {
       my ($server) = @_;
-      my $client = Rex::IO::Client->new();
+      my $client = Rex::IO::Client->new;
 
       my $ret = {};
       eval {
@@ -68,6 +73,7 @@ sub help {
    print "    --get <key>           get values of key from cmdb\n";
    print "    --server-add <server> add a new server to the cmdb\n";
    print "    --server-rm <server>  delete a server from the cmdb\n";
+   print "    --server-get <server> get all cmdb information of server\n";
    print "--------------------------------------------------------------------------------\n";
 
    exit;

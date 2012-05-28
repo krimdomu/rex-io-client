@@ -29,11 +29,14 @@ sub new {
 }
 
 sub get_information {
-   my ($self) = @_;
+   my ($self, $host) = @_;
 
-   my %hw_info = Rex::Hardware->get(qw/Host/);
+   if(! $host) {
+      my %hw_info = Rex::Hardware->get(qw/Host/);
+      $host = $hw_info{Host}->{hostname};
+   }
 
-   my $tx = $self->_ua->get("$io_server/server/" . $hw_info{Host}->{hostname});
+   my $tx = $self->_ua->get("$io_server/server/$host");
    if($tx->success) {
       my $data = $self->_json->decode($tx->res->body)->{data};
 
@@ -45,7 +48,7 @@ sub get_information {
    else {
       my ($message, $code) = $tx->error;
       if($code == 404) {
-         die("Client (" . $hw_info{Host}->{hostname} . ") not found.");
+         die("Client (" . $host . ") not found.");
       }
 
       die("Unknown error.");
@@ -68,6 +71,11 @@ sub get {
    }
 
    return $data;
+}
+
+sub get_server {
+   my ($self, $server) = @_;
+   return $self->get_information($server);
 }
 
 sub add_server {
