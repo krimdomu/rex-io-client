@@ -1,0 +1,20 @@
+=pod
+
+=head2 Rex::IO::Client
+
+This is the client component of the Rex.IO Infrastructure.
+
+This is a work in progress project.
+
+=head2 Requirements
+
+=over 4
+
+=item Mojolicious
+
+=item Rex::IO::Server
+
+=item Rex::IO::CMDB
+
+=back
+
