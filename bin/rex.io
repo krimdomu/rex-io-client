@@ -72,7 +72,6 @@ getopts(
       my ($service) = @_;
       my $client = Rex::IO::Client->new;
       my %opts = Rex::IO::Client::Args->get;
-      print Dumper(\%opts);
       $opts{desc} ||= "";
 
       my $ret = {};
