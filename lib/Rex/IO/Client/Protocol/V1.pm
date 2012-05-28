@@ -45,12 +45,29 @@ sub get_information {
    else {
       my ($message, $code) = $tx->error;
       if($code == 404) {
-         die("Client not found.");
+         die("Client (" . $hw_info{Host}->{hostname} . ") not found.");
       }
 
       die("Unknown error.");
    }
 
+}
+
+sub get {
+   my ($self, %option) = @_;
+
+   my $info = $self->get_information();
+   my $data = $info->{$option{type}}->{$option{module}}->{$option{key}};
+
+   # perhaps someone use a filename as a key 
+   # like /etc/ntp.conf and forgot one "/"
+   # service://ntp/etc/ntp.conf (wrong)
+   # service://ntp//etc/ntp.conf (right)
+   if(! $data) {
+      $data = $info->{$option{type}}->{$option{module}}->{"/".$option{key}};
+   }
+
+   return $data;
 }
 
 sub dump {
