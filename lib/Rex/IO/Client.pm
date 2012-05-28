@@ -41,6 +41,16 @@ sub get_variables {
    return $ret->{variables};
 }
 
+sub add_server {
+   my ($self, $name) = @_;
+   $self->_client->add_server($name);
+}
+
+sub rm_server {
+   my ($self, $name) = @_;
+   $self->_client->rm_server($name);
+}
+
 sub dump {
    my ($self) = @_;
    $self->_client->dump;

@@ -70,6 +70,33 @@ sub get {
    return $data;
 }
 
+sub add_server {
+   my ($self, $server) = @_;
+
+   my $tx = $self->_ua->put("$io_server/server",
+      { "Content-Type" => "application/json" },
+      Mojo::JSON->encode({name => $server}),
+   );
+
+   if($tx->success) {
+      return $self->_json->decode($tx->res->body);
+   }
+
+   die("Can't add server");
+}
+
+sub rm_server {
+   my ($self, $server) = @_;
+
+   my $tx = $self->_ua->delete("$io_server/server/$server");
+
+   if($tx->success) {
+      return $self->_json->decode($tx->res->body);
+   }
+
+   die("Can't delete server");
+}
+
 sub dump {
    my ($self) = @_;
    print Dump($self->get_information);
