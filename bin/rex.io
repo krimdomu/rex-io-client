@@ -36,10 +36,16 @@ getopts(
    "server-add" => sub {
       my ($server) = @_;
       my $client = Rex::IO::Client->new;
+      my %opts = Rex::IO::Client::Args->get;
+      $opts{service} ||= "{}";
+
+      my $service = Mojo::JSON->decode($opts{service});
 
       my $ret = {};
       eval {
-         $ret = $client->add_server($server);
+         $ret = $client->add_server($server, {
+            service => $service,
+         });
       };
 
       if($@) {
@@ -118,6 +124,7 @@ sub help {
    print "    --dump                      to display every cmdb option known to this client\n";
    print "    --get=<key>                 get values of key from cmdb\n";
    print "    --server-add=<server>       add a new server to the cmdb\n";
+   print "          --service=<string>    add services to server in json format\n";
    print "    --server-rm=<server>        delete a server from the cmdb\n";
    print "    --server-get=<server>       get all cmdb information of server\n";
    print "    --service-add=<server>      add a new service to the cmdb\n";

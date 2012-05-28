@@ -62,8 +62,8 @@ sub get_server {
 }
 
 sub add_server {
-   my ($self, $name) = @_;
-   $self->_client->add_server($name);
+   my ($self, $name, $option) = @_;
+   $self->_client->add_server($name, $option);
 }
 
 sub rm_server {

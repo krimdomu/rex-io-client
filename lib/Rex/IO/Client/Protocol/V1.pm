@@ -79,11 +79,15 @@ sub get_server {
 }
 
 sub add_server {
-   my ($self, $server) = @_;
+   my ($self, $server, $option) = @_;
+
+   $option ||= {};
+   my $ref = $option;
+   $ref->{name} = $server;
 
    my $tx = $self->_ua->put("$io_server/server",
       { "Content-Type" => "application/json" },
-      Mojo::JSON->encode({name => $server}),
+      Mojo::JSON->encode($ref),
    );
 
    if($tx->success) {
