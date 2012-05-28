@@ -18,6 +18,8 @@ use vars qw(@EXPORT %OPTS);
 sub getopts {
    my (%opts) = @_;
 
+   my @execute = ();
+
    my @params = @ARGV[0..$#ARGV];
 
    for my $p (@params) {
@@ -30,8 +32,12 @@ sub getopts {
 
       if(exists $opts{$key}) {
          my $code = $opts{$key};
-         &$code($val);
+         push(@execute, sub { &$code($val); });
       }
+   }
+
+   for my $code (@execute) {
+      &$code();
    }
 
 }
