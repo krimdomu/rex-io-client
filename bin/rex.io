@@ -10,6 +10,7 @@ use YAML;
 use Rex::IO::Client::Args;
 use Rex::IO::Client;
 
+use Mojo::JSON;
 use Data::Dumper;
 
 getopts(
@@ -73,11 +74,15 @@ getopts(
       my $client = Rex::IO::Client->new;
       my %opts = Rex::IO::Client::Args->get;
       $opts{desc} ||= "";
+      $opts{variables} ||= "{}";
+
+      my $variables = Mojo::JSON->decode($opts{variables});
 
       my $ret = {};
       eval {
          $ret = $client->add_service($service, {
             descrition => $opts{desc},
+            variables  => $variables,
          });
       };
 
@@ -109,16 +114,17 @@ getopts(
 sub help {
    print "--------------------------------------------------------------------------------\n";
    print " rex.io - Command Line Client Version $Rex::IO::Client::VERSION\n";
-   print "    --help                  to display this help message\n";
-   print "    --dump                  to display every cmdb option known to this client\n";
-   print "    --get=<key>             get values of key from cmdb\n";
-   print "    --server-add=<server>   add a new server to the cmdb\n";
-   print "    --server-rm=<server>    delete a server from the cmdb\n";
-   print "    --server-get=<server>   get all cmdb information of server\n";
-   print "    --service-add=<server>  add a new service to the cmdb\n";
-   print "          --desc=<desc>     add a description to the new service\n";
-   print "    --service-rm=<server>   delete a service from the cmdb\n";
-   print "    --service-get=<server>  get all cmdb information of service\n";
+   print "    --help                      to display this help message\n";
+   print "    --dump                      to display every cmdb option known to this client\n";
+   print "    --get=<key>                 get values of key from cmdb\n";
+   print "    --server-add=<server>       add a new server to the cmdb\n";
+   print "    --server-rm=<server>        delete a server from the cmdb\n";
+   print "    --server-get=<server>       get all cmdb information of server\n";
+   print "    --service-add=<server>      add a new service to the cmdb\n";
+   print "          --desc=<desc>         add a description to the new service\n";
+   print "          --variables=<string>  add additional variables in json format\n";
+   print "    --service-rm=<server>       delete a service from the cmdb\n";
+   print "    --service-get=<server>      get all cmdb information of service\n";
    print "--------------------------------------------------------------------------------\n";
 
    exit;
