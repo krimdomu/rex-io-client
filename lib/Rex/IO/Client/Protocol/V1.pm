@@ -105,6 +105,60 @@ sub rm_server {
    die("Can't delete server");
 }
 
+sub get_service {
+   my ($self, $service) = @_;
+
+   my $tx = $self->_ua->get("$io_server/service/$service");
+   if($tx->success) {
+      my $data = $self->_json->decode($tx->res->body)->{data};
+
+      delete $data->{name};
+      delete $data->{type};
+
+      return $data;
+   }
+   else {
+      my ($message, $code) = $tx->error;
+      if($code == 404) {
+         die("Service (" . $service . ") not found.");
+      }
+
+      die("Unknown error.");
+   }
+
+}
+
+sub add_service {
+   my ($self, $service, $option) = @_;
+
+   $option ||= {};
+   my $ref = $option;
+   $ref->{name} = $service;
+
+   my $tx = $self->_ua->put("$io_server/service",
+      { "Content-Type" => "application/json" },
+      Mojo::JSON->encode($ref),
+   );
+
+   if($tx->success) {
+      return $self->_json->decode($tx->res->body);
+   }
+
+   die("Can't add service");
+}
+
+sub rm_service {
+   my ($self, $server) = @_;
+
+   my $tx = $self->_ua->delete("$io_server/service/$server");
+
+   if($tx->success) {
+      return $self->_json->decode($tx->res->body);
+   }
+
+   die("Can't delete service");
+}
+
 sub dump {
    my ($self) = @_;
    print Dump($self->get_information);

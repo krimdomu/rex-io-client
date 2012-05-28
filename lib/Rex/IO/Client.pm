@@ -41,6 +41,21 @@ sub get_variables {
    return $ret->{variables};
 }
 
+sub get_service {
+   my ($self, $name) = @_;
+   $self->_client->get_service($name);
+}
+
+sub add_service {
+   my ($self, $name, $option) = @_;
+   $self->_client->add_service($name, $option);
+}
+
+sub rm_service {
+   my ($self, $name) = @_;
+   $self->_client->rm_service($name);
+}
+
 sub get_server {
    my ($self, $name) = @_;
    $self->_client->get_server($name);
