@@ -76,6 +76,11 @@ sub dump {
    $self->_client->dump;
 }
 
+sub list_server {
+   my ($self) = @_;
+   $self->_client->list_server();
+}
+
 sub _client {
    my ($self) = @_;
    return Rex::IO::Client::Protocol->factory("V1");

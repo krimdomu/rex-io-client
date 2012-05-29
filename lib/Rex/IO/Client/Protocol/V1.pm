@@ -85,7 +85,7 @@ sub add_server {
    my $ref = $option;
    $ref->{name} = $server;
 
-   my $tx = $self->_ua->put("$io_server/server",
+   my $tx = $self->_ua->post("$io_server/server",
       { "Content-Type" => "application/json" },
       Mojo::JSON->encode($ref),
    );
@@ -139,7 +139,7 @@ sub add_service {
    my $ref = $option;
    $ref->{name} = $service;
 
-   my $tx = $self->_ua->put("$io_server/service",
+   my $tx = $self->_ua->post("$io_server/service",
       { "Content-Type" => "application/json" },
       Mojo::JSON->encode($ref),
    );
@@ -161,6 +161,19 @@ sub rm_service {
    }
 
    die("Can't delete service");
+}
+
+sub list_server {
+   my ($self) = @_;
+
+   my $tx = $self->_ua->build_tx(LIST => "$io_server/server");
+   $self->_ua->start($tx);
+
+   if($tx->success) {
+      return $self->_json->decode($tx->res->body);
+   }
+
+   die("Can't list servers");
 }
 
 sub dump {
