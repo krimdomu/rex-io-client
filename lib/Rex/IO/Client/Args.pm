@@ -22,6 +22,7 @@ sub getopts {
 
    my @params = @ARGV[0..$#ARGV];
 
+   my $execute;
    for my $p (@params) {
       my($key, $val) = split(/=/, $p, 2);
       $val ||= 1;
@@ -30,15 +31,13 @@ sub getopts {
 
       $OPTS{$key} = $val;
 
-      if(exists $opts{$key}) {
+      if(exists $opts{$key} && ! $execute) {
          my $code = $opts{$key};
-         push(@execute, sub { &$code($val); });
+         $execute = sub { &$code($val); };
       }
    }
 
-   for my $code (@execute) {
-      &$code();
-   }
+   &$execute();
 
 }
 

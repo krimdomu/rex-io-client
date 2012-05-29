@@ -190,6 +190,33 @@ sub list_service {
 }
 
 
+sub add_service_to_server {
+   my ($self, $server, $service) = @_;
+
+   my $tx = $self->_ua->build_tx(LINK => "$io_server/server/$server" => { "Content-Type" => "application/json" } => Mojo::JSON->encode({service => $service}));
+   $self->_ua->start($tx);
+
+   if($tx->success) {
+      return $self->_json->decode($tx->res->body);
+   }
+
+   die("Can't add service to server");
+}
+
+sub remove_service_from_server {
+   my ($self, $server, $service) = @_;
+
+   my $tx = $self->_ua->build_tx(UNLINK => "$io_server/server/$server" => { "Content-Type" => "application/json" } => Mojo::JSON->encode({service => $service}));
+   $self->_ua->start($tx);
+
+   if($tx->success) {
+      return $self->_json->decode($tx->res->body);
+   }
+
+   die("Can't remove service from server");
+}
+
+
 sub dump {
    my ($self) = @_;
    print Dump($self->get_information);

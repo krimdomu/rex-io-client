@@ -86,6 +86,16 @@ sub list_service {
    $self->_client->list_service();
 }
 
+sub add_service_to_server {
+   my ($self, $server, $service) = @_;
+   $self->_client->add_service_to_server($server, $service);
+}
+
+sub remove_service_from_server {
+   my ($self, $server, $service) = @_;
+   $self->_client->remove_service_from_server($server, $service);
+}
+
 sub _client {
    my ($self) = @_;
    return Rex::IO::Client::Protocol->factory("V1");

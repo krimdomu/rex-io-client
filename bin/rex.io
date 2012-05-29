@@ -142,6 +142,29 @@ getopts(
 
       print Dump($data->{data});
    },
+   "server" => sub {
+      my ($server) = @_;
+      my $client = Rex::IO::Client->new();
+
+      my %opts = Rex::IO::Client::Args->get;
+      my $ret;
+
+      if(exists $opts{"service-add"}) {
+         $ret = $client->add_service_to_server($server, $opts{"service-add"});
+      }
+
+      if(exists $opts{"service-rm"}) {
+         $ret = $client->remove_service_from_server($server, $opts{"service-rm"});
+      }
+
+      if($ret->{ok} == Mojo::JSON->true) {
+         print "ok\n";
+      }
+      else {
+         print "failed\n";
+      }
+
+   },
 
 
 );
@@ -149,20 +172,24 @@ getopts(
 sub help {
    print "--------------------------------------------------------------------------------\n";
    print " rex.io - Command Line Client Version $Rex::IO::Client::VERSION\n";
-   print "    --help                      to display this help message\n";
-   print "    --dump                      to display every cmdb option known to this client\n";
-   print "    --get=<key>                 get values of key from cmdb\n";
-   print "    --server-add=<server>       add a new server to the cmdb\n";
-   print "          --service=<string>    add services to server in json format\n";
-   print "    --server-rm=<server>        delete a server from the cmdb\n";
-   print "    --server-get=<server>       get all cmdb information of server\n";
-   print "    --service-add=<server>      add a new service to the cmdb\n";
-   print "          --desc=<desc>         add a description to the new service\n";
-   print "          --variables=<string>  add additional variables in json format\n";
-   print "    --service-rm=<server>       delete a service from the cmdb\n";
-   print "    --service-get=<server>      get all cmdb information of service\n";
-   print "    --list-servers              lists all known servers and their configuration\n";
-   print "    --list-services             lists all known services\n";
+   print "    --help                          to display this help message\n";
+   print "    --dump                          to display every cmdb option known to this client\n";
+   print "    --get=<key>                     get values of key from cmdb\n";
+   print "    --server-add=<server>           add a new server to the cmdb\n";
+   print "          --service=<string>        add services to server in json format\n";
+   print "    --server-rm=<server>            delete a server from the cmdb\n";
+   print "    --server-get=<server>           get all cmdb information of server\n";
+   print "    --server=<server>\n";
+   print "          --service-add=<service>   add a new service to a server\n";
+   print "          --service-rm=<service>    remove a service from a server\n";
+   print "    --service-add=<server>          add a new service to the cmdb\n";
+   print "          --desc=<desc>             add a description to the new service\n";
+   print "          --variables=<string>      add additional variables in json format\n";
+   print "    --service-rm=<server>           delete a service from the cmdb\n";
+   print "    --service-get=<server>          get all cmdb information of service\n";
+   print "    --list-servers                  lists all known servers and their\n";
+   print "                                    configuration\n";
+   print "    --list-services                 lists all known services\n";
    print "--------------------------------------------------------------------------------\n";
 
    exit;
