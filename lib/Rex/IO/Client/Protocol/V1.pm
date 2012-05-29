@@ -176,6 +176,20 @@ sub list_server {
    die("Can't list servers");
 }
 
+sub list_service {
+   my ($self) = @_;
+
+   my $tx = $self->_ua->build_tx(LIST => "$io_server/service");
+   $self->_ua->start($tx);
+
+   if($tx->success) {
+      return $self->_json->decode($tx->res->body);
+   }
+
+   die("Can't list services");
+}
+
+
 sub dump {
    my ($self) = @_;
    print Dump($self->get_information);

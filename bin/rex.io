@@ -128,6 +128,21 @@ getopts(
 
       print Dump($data->{data});
    },
+   "list-services" => sub {
+      my $client = Rex::IO::Client->new();
+      my $data;
+      eval {
+         $data = $client->list_service();
+      };
+
+      if($@) {
+         print "Error listing services: $@\n";
+         exit 1;
+      }
+
+      print Dump($data->{data});
+   },
+
 
 );
 
@@ -147,6 +162,7 @@ sub help {
    print "    --service-rm=<server>       delete a service from the cmdb\n";
    print "    --service-get=<server>      get all cmdb information of service\n";
    print "    --list-servers              lists all known servers and their configuration\n";
+   print "    --list-services             lists all known services\n";
    print "--------------------------------------------------------------------------------\n";
 
    exit;
