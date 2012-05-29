@@ -96,6 +96,15 @@ sub remove_service_from_server {
    $self->_client->remove_service_from_server($server, $service);
 }
 
+sub configure_service_of_server {
+   my ($self, $server, $service, $section, $variables) = @_;
+   $self->_client->configure_service_of_server($server, $service, {
+      $section => {
+         variables => $variables,
+      }
+   });
+}
+
 sub _client {
    my ($self) = @_;
    return Rex::IO::Client::Protocol->factory("V1");

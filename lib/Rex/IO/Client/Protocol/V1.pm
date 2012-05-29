@@ -216,6 +216,18 @@ sub remove_service_from_server {
    die("Can't remove service from server");
 }
 
+sub configure_service_of_server {
+   my ($self, $server, $service, $data) = @_;
+
+   my $tx = $self->_ua->put("$io_server/server/$server/service/$service" => { "Content-Type" => "application/json" } => Mojo::JSON->encode($data));
+
+   if($tx->success) {
+      return $self->_json->decode($tx->res->body);
+   }
+
+   die("Can't configure service $service of server $server.");
+}
+
 
 sub dump {
    my ($self) = @_;

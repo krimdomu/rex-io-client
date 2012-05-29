@@ -157,6 +157,10 @@ getopts(
          $ret = $client->remove_service_from_server($server, $opts{"service-rm"});
       }
 
+      if(exists $opts{service} && exists $opts{section} && exists $opts{variables}) {
+         $ret = $client->configure_service_of_server($server, $opts{service}, $opts{section}, Mojo::JSON->decode($opts{variables}));
+      }
+
       if($ret->{ok} == Mojo::JSON->true) {
          print "ok\n";
       }
