@@ -12,6 +12,19 @@ use Rex::IO::Client;
 
 use Mojo::JSON;
 use Data::Dumper;
+use Rex::IO::Client::Config;
+
+my @files = ("/etc/rex/io/client.conf", "/usr/local/etc/rex/io/client.conf", "client.conf");
+
+my $cfg;
+for my $file (@files) {
+   if(-f $file) {
+      $cfg = $file;
+      last;
+   }
+}
+
+Rex::IO::Client::Config->load(file => $cfg);
 
 getopts(
    help => \&help,

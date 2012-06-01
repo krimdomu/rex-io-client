@@ -15,8 +15,8 @@ use Mojo::JSON;
 use Rex::Hardware;
 use Data::Dumper;
 use YAML;
+use Rex::IO::Client::Config;
 
-my $io_server = "http://localhost:3000";
 
 sub new {
    my $that = shift;
@@ -36,6 +36,7 @@ sub get_information {
       $host = $hw_info{Host}->{hostname};
    }
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->get("$io_server/server/$host");
    if($tx->success) {
       my $data = $self->_json->decode($tx->res->body)->{data};
@@ -85,6 +86,7 @@ sub add_server {
    my $ref = $option;
    $ref->{name} = $server;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->post("$io_server/server",
       { "Content-Type" => "application/json" },
       Mojo::JSON->encode($ref),
@@ -100,6 +102,7 @@ sub add_server {
 sub rm_server {
    my ($self, $server) = @_;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->delete("$io_server/server/$server");
 
    if($tx->success) {
@@ -112,6 +115,7 @@ sub rm_server {
 sub get_service {
    my ($self, $service) = @_;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->get("$io_server/service/$service");
    if($tx->success) {
       my $data = $self->_json->decode($tx->res->body)->{data};
@@ -139,6 +143,7 @@ sub add_service {
    my $ref = $option;
    $ref->{name} = $service;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->post("$io_server/service",
       { "Content-Type" => "application/json" },
       Mojo::JSON->encode($ref),
@@ -154,6 +159,7 @@ sub add_service {
 sub rm_service {
    my ($self, $server) = @_;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->delete("$io_server/service/$server");
 
    if($tx->success) {
@@ -166,6 +172,7 @@ sub rm_service {
 sub list_server {
    my ($self) = @_;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->build_tx(LIST => "$io_server/server");
    $self->_ua->start($tx);
 
@@ -179,6 +186,7 @@ sub list_server {
 sub list_service {
    my ($self) = @_;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->build_tx(LIST => "$io_server/service");
    $self->_ua->start($tx);
 
@@ -193,6 +201,7 @@ sub list_service {
 sub add_service_to_server {
    my ($self, $server, $service) = @_;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->build_tx(LINK => "$io_server/server/$server" => { "Content-Type" => "application/json" } => Mojo::JSON->encode({service => $service}));
    $self->_ua->start($tx);
 
@@ -206,6 +215,7 @@ sub add_service_to_server {
 sub remove_service_from_server {
    my ($self, $server, $service) = @_;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->build_tx(UNLINK => "$io_server/server/$server" => { "Content-Type" => "application/json" } => Mojo::JSON->encode({service => $service}));
    $self->_ua->start($tx);
 
@@ -219,6 +229,7 @@ sub remove_service_from_server {
 sub configure_service_of_server {
    my ($self, $server, $service, $data) = @_;
 
+   my $io_server = $self->_server;
    my $tx = $self->_ua->put("$io_server/server/$server/service/$service" => { "Content-Type" => "application/json" } => Mojo::JSON->encode($data));
 
    if($tx->success) {
@@ -242,6 +253,11 @@ sub _json {
 sub _ua {
    my ($self) = @_;
    return Mojo::UserAgent->new;
+}
+
+sub _server {
+   my ($self) = @_;
+   return Rex::IO::Client::Config->get()->{"server"};
 }
 
 1;
