@@ -70,7 +70,7 @@ To use the configuration database within your Rexfiles you can do this like that
  # Rexfile
  use Rex::IO::Client;
     
- group frontends => "fe01", "fe02", "fe03";
+ group frontends => "serv01";
     
  task "prepare", group => "frontends", sub {
     file "/etc/ntp.conf",
