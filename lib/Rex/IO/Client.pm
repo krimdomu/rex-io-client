@@ -17,7 +17,7 @@ use vars qw(@EXPORT);
 
 use Rex::IO::Client::Protocol;
 
-our $VERSION = "0.30.99.0";
+our $VERSION = "0.0.1";
 
 sub new {
    my $that = shift;
