@@ -22,7 +22,7 @@ sub getopts {
 
    my @params = @ARGV[0..$#ARGV];
 
-   my $execute = $opts{help};
+   my $execute;
    for my $p (@params) {
       my($key, $val) = split(/=/, $p, 2);
       $val ||= 1;
@@ -35,6 +35,10 @@ sub getopts {
          my $code = $opts{$key};
          $execute = sub { &$code($val); };
       }
+   }
+
+   if(!$execute) {
+      $execute = $opts{help};
    }
 
    &$execute();
