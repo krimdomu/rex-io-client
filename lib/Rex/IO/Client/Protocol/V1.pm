@@ -40,10 +40,6 @@ sub get_information {
    my $tx = $self->_ua->get("$io_server/server/$host");
    if($tx->success) {
       my $data = $self->_json->decode($tx->res->body)->{data};
-
-      delete $data->{name};
-      delete $data->{type};
-
       return $data;
    }
    else {

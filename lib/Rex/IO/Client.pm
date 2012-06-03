@@ -18,7 +18,7 @@ Rex::IO::Client - Client Library for Rex::IO::Server
 
 =back
 
-=head1 FUNCTIONS
+=head1 METHODS
 
 =over 4
 
@@ -35,9 +35,16 @@ use vars qw(@EXPORT);
 
 @EXPORT = qw(cmdb_get);
 
+use Rex::IO::Client::Config;
 use Rex::IO::Client::Protocol;
 
-our $VERSION = "0.0.1";
+our $VERSION = "0.0.2";
+
+=item new()
+
+Constructor
+
+=cut
 
 sub new {
    my $that = shift;
@@ -61,26 +68,52 @@ sub get_variables {
    return $ret->{variables};
 }
 
+=item get_service($service)
+
+Request information of $service.
+
+=cut
 sub get_service {
    my ($self, $name) = @_;
    $self->_client->get_service($name);
 }
 
+
+=item add_service($service, $option)
+
+Create a new service $service with the options provided by $option. $option is a hashRef.
+
+=cut
 sub add_service {
    my ($self, $name, $option) = @_;
    $self->_client->add_service($name, $option);
 }
 
+=item rm_service($name)
+
+Remove $service.
+
+=cut
 sub rm_service {
    my ($self, $name) = @_;
    $self->_client->rm_service($name);
 }
 
+=item get_server($server)
+
+Request information of $server.
+
+=cut
 sub get_server {
    my ($self, $name) = @_;
    $self->_client->get_server($name);
 }
 
+=item add_server($name, $option)
+
+Create a new server $name. With the options provided by $option. $option is a hashRef.
+
+=cut
 sub add_server {
    my ($self, $name, $option) = @_;
    $self->_client->add_server($name, $option);
@@ -96,11 +129,21 @@ sub dump {
    $self->_client->dump;
 }
 
+=item list_server()
+
+Returns a list of all servers known to the CMDB.
+
+=cut
 sub list_server {
    my ($self) = @_;
    $self->_client->list_server();
 }
 
+=item list_service()
+
+Returns a list of all services kown to the CMDB.
+
+=cut
 sub list_service {
    my ($self) = @_;
    $self->_client->list_service();
@@ -129,6 +172,13 @@ sub _client {
    my ($self) = @_;
    return Rex::IO::Client::Protocol->factory("V1");
 }
+
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
 
 =item cmdb_get($key)
 
