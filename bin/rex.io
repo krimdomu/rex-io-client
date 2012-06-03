@@ -14,27 +14,6 @@ use Mojo::JSON;
 use Data::Dumper;
 use Rex::IO::Client::Config;
 
-my @cfg = ("/etc/rex/io/client.conf", "/usr/local/etc/rex/io/client.conf", "client.conf");
-
-my $cfg;
-for my $file (@cfg) {
-   if(-f $file) {
-      $cfg = $file;
-      last;
-   }
-}
-
-unless($cfg) {
-   print "No configuration file found.\n";
-   print "Please create a configuration file in one of the following locations:\n";
-   print " * " . join("\n * ", @cfg);
-   print "\n";
-
-   exit 1;
-}
-
-Rex::IO::Client::Config->load(file => $cfg);
-
 getopts(
    help => \&help,
    dump => sub {
@@ -240,6 +219,181 @@ sub help {
 
 =head1 rex.io - client for the rex.io infrastructure
 
-Rex.IO is a server infrastructure around the Rex Framework. 
+Rex.IO is a server infrastructure around the Rex Framework. It will combine serveral tools under one interface. The first tool integrated is a small configuration database L<Rex::IO::CMDB>.
 
 
+=head2 Command line options
+
+=over 4
+
+=item    --help                          to display this help message
+
+=item    --dump                          to display every cmdb option known to this client
+
+=item    --get=<key>                     get values of key from cmdb
+
+=item    --server=<server>
+
+=item       --add                        add a new server to the cmdb
+
+=item       --rm                         delete a server from the cmdb
+
+=item       --get                        get all cmdb information of server
+
+=item       --service=<service>
+
+=item          --add                     add a new service to a server
+
+=item          --rm                      remove a service from a server
+
+=item          --section=<section>       configure a section
+
+=item             --variables=<json>     configure variables of a section
+
+=item    --service=<service> 
+
+=item       --add                        add a new service to the cmdb
+
+=item       --rm                         delete a service from the cmdb
+
+=item       --get                        get all cmdb information of service
+
+=item       --desc=<desc>                add a description to the new service
+
+=item       --variables=<string>         add additional variables in json format
+
+=item    --list-servers                  lists all known servers and their configuration
+
+=item    --list-services                 lists all known services
+
+=back
+
+=head2 WORDING
+
+=head3 SERVICE
+
+A service is a abstract description of a configuration item. Like "ntp" or "apache". A typical service exists of serveral sections. Every section exists of serveral variables. These sections can be multidimensional.
+
+Example:
+
+ {
+    "configuration": {
+       "server": {
+          "default": "ntp.local.lan",
+          "type": "string"
+       },
+       "restrict": {
+          "default": [
+             "127.0.0.1"
+          ],
+          "type": "array"
+       }
+    }
+ }
+
+Variable types can be string, integer, array, hash, date, time, datetime, float, double.
+
+=head3 SERVER
+
+A server is an object representing an individual server. A typical server looks like this. This server is configured with the ntp service from above. But with an individual "server" variable.
+
+ {
+    "name": "fe01",
+    "type": "server",
+    "service": {
+       "ntp": {
+          "configuration": {
+             "variables": {
+                "server": "pool.ntp.org",
+                "restrict": [
+                   "127.0.0.1"
+                ]
+             }
+          }
+       }
+    }
+ }
+
+=head2 EXAMPLES
+
+=over 4
+
+=item *
+
+Add a new service
+
+This example will add a service named "ntp". With the configuration structure shown in the example above.
+
+ rex.io --service=ntp --add --desc="NTP Service" --variables='{"configuration": {"server": {"type": "string", "default": "ntp.local.lan"}, "restrict": {"type": "array", "default": ["127.0.0.1"]}}}'
+
+=item *
+
+Add a new server
+
+ rex.io --server=fe01 --add
+
+=item *
+
+Add a service to a server
+
+ rex.io --server=fe01 --service=ntp --add
+
+=item *
+
+Configure a special variable
+
+ rex.io --server=fe01 --service=ntp --section=configuration --variables='{"server": "pool.ntp.org"}'
+
+Or, if you want to configure an array variable
+
+ rex.io --server=fe01 --service=ntp --section=configuration --variables='{"restrict": ["127.0.0.1", "172.16.230.11"]}'
+
+=item *
+
+Remove a service from a server
+
+ rex.io --server=fe01 --service=ntp --rm
+
+=item *
+
+Remove a server
+
+ rex.io --server=fe01 --rm
+
+=item *
+
+Remove a service
+
+ rex.io --service=ntp --rm
+
+=back
+
+=head2 USAGE INSIDE A REXFILE
+
+If you want to use these configurations inside a Rexfile you can do this with the I<cmdb_get()> function.
+
+Example of a Rexfile:
+
+ # Rexfile
+ use Rex::IO::Client;
+    
+ set group => "frontends" => "fe01", "fe02";
+    
+ task "prepare_ntp", group => "frontends", sub {
+    file "/etc/ntp.conf",
+       content => template("templates/etc/ntp.conf.tpl", cmdb_get("service://ntp/configuration")),
+       owner   => "root",
+       mode    => 644;
+        
+    service ntpd => "start";
+ };
+
+And your ntp.conf template file can look like this:
+
+ server  <%= $::server %>
+
+ <% for my $restrict_srv (@{ $::restrict }) { %>
+ restrict  <%= $restrict_srv %>
+ <% } %>
+
+ driftfile /var/run/ntp/drift 
