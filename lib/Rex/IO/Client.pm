@@ -4,6 +4,26 @@
 # vim: set ts=3 sw=3 tw=0:
 # vim: set expandtab:
    
+=head1 NAME
+
+Rex::IO::Client - Client Library for Rex::IO::Server
+
+=head1 GETTING HELP
+
+=over 4
+
+=item * IRC: irc.freenode.net #rex
+
+=item * Bug Tracker: L<https://github.com/krimdomu/rex-io-client/issues>
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
+
+=cut
+
 package Rex::IO::Client;
    
 use strict;
@@ -110,6 +130,40 @@ sub _client {
    return Rex::IO::Client::Protocol->factory("V1");
 }
 
+=item cmdb_get($key)
+
+You can use this function inside your I<Rexfile> to get configuration parameters from L<Rex::IO::CMDB>.
+
+ my @configuration = cmdb_get("service://$service_name/$service_section");
+
+Example of a Rexfile:
+
+ # Rexfile
+ use Rex::IO::Client;
+    
+ set group => "frontends" => "fe01", "fe02";
+    
+ task "prepare_ntp", group => "frontends", sub {
+    file "/etc/ntp.conf",
+       content => template("templates/etc/ntp.conf.tpl", cmdb_get("service://ntp/configuration")),
+       owner   => "root",
+       mode    => 644;
+        
+    service ntpd => "start";
+ };
+
+And your ntp.conf template file can look like this:
+
+ server  <%= $::server %>
+    
+ <% for my $restrict_srv (@{ $::restrict }) { %>
+ restrict  <%= $restrict_srv %>
+ <% } %>
+   
+ driftfile /var/run/ntp/drift 
+
+=cut
+
 # static function
 sub cmdb_get {
    my ($type, $module, $key) = ($_[0] =~ m/^([a-zA-Z]+):\/\/([a-zA-Z_\-\.]+)\/(.*)$/);
@@ -123,5 +177,9 @@ sub cmdb_get {
 
    return %{ $ret };
 }
+
+=back
+
+=cut
 
 1;

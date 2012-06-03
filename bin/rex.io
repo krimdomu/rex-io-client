@@ -391,9 +391,9 @@ Example of a Rexfile:
 And your ntp.conf template file can look like this:
 
  server  <%= $::server %>
-
+    
  <% for my $restrict_srv (@{ $::restrict }) { %>
  restrict  <%= $restrict_srv %>
  <% } %>
-
+    
  driftfile /var/run/ntp/drift 
