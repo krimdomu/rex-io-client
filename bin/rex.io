@@ -24,6 +24,15 @@ for my $file (@files) {
    }
 }
 
+unless($cfg) {
+   print "No configuration file found.\n";
+   print "Please create a configuration file in one of the following locations:\n";
+   print " * " . join("\n * ", @cfg);
+   print "\n";
+
+   exit 1;
+}
+
 Rex::IO::Client::Config->load(file => $cfg);
 
 getopts(
