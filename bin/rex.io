@@ -14,10 +14,10 @@ use Mojo::JSON;
 use Data::Dumper;
 use Rex::IO::Client::Config;
 
-my @files = ("/etc/rex/io/client.conf", "/usr/local/etc/rex/io/client.conf", "client.conf");
+my @cfg = ("/etc/rex/io/client.conf", "/usr/local/etc/rex/io/client.conf", "client.conf");
 
 my $cfg;
-for my $file (@files) {
+for my $file (@cfg) {
    if(-f $file) {
       $cfg = $file;
       last;
@@ -236,6 +236,10 @@ sub help {
    exit;
 }
 
+=pod
 
+=head1 rex.io - client for the rex.io infrastructure
+
+Rex.IO is a server infrastructure around the Rex Framework. 
 
 
