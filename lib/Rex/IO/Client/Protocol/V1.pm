@@ -56,7 +56,7 @@ sub get_information {
 sub get {
    my ($self, %option) = @_;
 
-   my $info = $self->get_information();
+   my $info = $self->get_information($option{server});
    my $data = $info->{$option{type}}->{$option{module}}->{$option{key}};
 
    # perhaps someone use a filename as a key 
