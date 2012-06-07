@@ -39,7 +39,7 @@ use vars qw(@EXPORT);
 use Rex::IO::Client::Config;
 use Rex::IO::Client::Protocol;
 
-our $VERSION = "0.0.3";
+our $VERSION = "0.0.4";
 
 =item new()
 
@@ -191,7 +191,10 @@ sub download_and_apply_services {
 
       if($@) { print "Error downloading $service_key.\n"; next; }
 
+      chdir "$service_key";
       system("rex __io__");
+      chdir "..";
+
       if($? != 0) {
          print "Error applying $service_key.\n";
          next;
