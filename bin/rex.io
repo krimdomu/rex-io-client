@@ -13,12 +13,25 @@ use Rex::IO::Client;
 use Mojo::JSON;
 use Data::Dumper;
 use Rex::IO::Client::Config;
+use Cwd qw(getcwd);
+require Rex::Commands::Fs;
 
 getopts(
    help => \&help,
    dump => sub {
       my $client = Rex::IO::Client->new;
       $client->dump;
+   },
+   run => sub {
+      Rex::Commands::Fs::mkdir(Rex::IO::Client::Config->get()->{"cache_dir"});
+      my $cwd = getcwd;
+      chdir(Rex::IO::Client::Config->get()->{"cache_dir"});
+      my $client = Rex::IO::Client->new;
+      $client->download_and_apply_services;
+      chdir($cwd);
+   },
+   apply => sub {
+      my ($service) = @_;
    },
    service => sub {
       my ($service) = @_;
@@ -191,6 +204,8 @@ sub help {
    print " rex.io - Command Line Client Version $Rex::IO::Client::VERSION\n";
    print "    --help                          to display this help message\n";
    print "    --dump                          to display every cmdb option known to this client\n";
+   print "    --run                           get all services belonging to this server and\n";
+   print "                                    executes them.\n";
    print "    --get=<key>                     get values of key from cmdb\n";
    print "    --server=<server>\n";
    print "       --add                        add a new server to the cmdb\n";

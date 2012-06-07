@@ -235,6 +235,26 @@ sub configure_service_of_server {
    die("Can't configure service $service of server $server.");
 }
 
+sub download_service {
+   my ($self, $service) = @_;
+   
+   my $io_server = $self->_server;
+   my $tx = $self->_ua->get("$io_server/repository/$service");
+
+   if($tx->success) {
+      open(my $fh, ">", "$service.tar.gz") or die($!);
+      binmode $fh;
+      print $fh $tx->res->body;
+      close($fh);
+
+      system("tar xzf $service.tar.gz");
+
+      if($? != 0) {
+         die("Error getting service.");
+      }
+   }
+}
+
 
 sub dump {
    my ($self) = @_;

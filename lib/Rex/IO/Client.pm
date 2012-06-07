@@ -28,6 +28,7 @@ package Rex::IO::Client;
    
 use strict;
 use warnings;
+use Data::Dumper;
 
 require Exporter;
 use base qw(Exporter);
@@ -166,6 +167,36 @@ sub configure_service_of_server {
          variables => $variables,
       }
    });
+}
+
+sub download_service {
+   my ($self, $service) = @_;
+   $self->_client->download_service($service);
+}
+
+sub download_and_apply_services {
+   my ($self) = @_;
+   
+   my $server = $self->get_server;
+   if(! ref($server)) {
+      die("Can't get service list. Exiting.");
+   }
+
+   my $service = $server->{service};
+
+   for my $service_key (keys %{ $service }) {
+      eval {
+         $self->download_service($service_key);
+      };
+
+      if($@) { print "Error downloading $service_key.\n"; next; }
+
+      system("rex __io__");
+      if($? != 0) {
+         print "Error applying $service_key.\n";
+         next;
+      }
+   }
 }
 
 sub _client {
