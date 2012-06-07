@@ -283,6 +283,32 @@ Rex.IO is a server infrastructure around the Rex Framework. It will combine serv
 
 =back
 
+=head2 CONFIGURATION
+
+rex.io client searchs for a configuration file in the following directories.
+
+=over 4
+
+=item *
+
+/etc/rex/io/client.conf
+
+=item *
+
+/usr/local/etc/rex/io/client.conf
+
+=back
+
+Example of a configuration file:
+
+ {
+    # the url pointing to Rex::IO::Server
+    server => "http://rex-io.lan:5000",
+       
+    # path to service cache directory
+    cache_dir => "/var/lib/rex/io/cache/service",
+ }
+
 =head2 WORDING
 
 =head3 SERVICE
