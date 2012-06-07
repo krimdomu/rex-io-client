@@ -39,7 +39,7 @@ use vars qw(@EXPORT);
 use Rex::IO::Client::Config;
 use Rex::IO::Client::Protocol;
 
-our $VERSION = "0.0.2";
+our $VERSION = "0.0.3";
 
 =item new()
 
