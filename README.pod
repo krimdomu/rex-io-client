@@ -4,6 +4,8 @@
 
 This is the client component of the Rex.IO Infrastructure.
 
+With this client you can also run Rex as an agent on your servers and let the configuration pull from a central server. See L<https://metacpan.org/module/Rex::IO::Server> for more information.
+
 This is a work in progress project.
 
 =head2 DEPENDENCIES
