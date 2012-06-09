@@ -32,6 +32,13 @@ getopts(
    },
    apply => sub {
       my ($service) = @_;
+
+      Rex::Commands::Fs::mkdir(Rex::IO::Client::Config->get()->{"cache_dir"});
+      my $cwd = getcwd;
+      chdir(Rex::IO::Client::Config->get()->{"cache_dir"});
+      my $client = Rex::IO::Client->new;
+      $client->download_and_apply_service($service);
+      chdir($cwd);
    },
    service => sub {
       my ($service) = @_;
@@ -51,13 +58,13 @@ getopts(
          my $ret = {};
          eval {
             $ret = $client->add_service($service, {
-               descrition => $opts{desc},
+               description => $opts{desc},
                variables  => $variables,
             });
          };
 
          if($@) {
-            print "Error adding new server.\n";
+            print "Error adding new service.\n";
             exit 1;
          }
 
@@ -78,6 +85,34 @@ getopts(
          }
 
          print "Service $service removed.\n";
+         exit;
+      }
+
+      elsif(exists $opts{"register"}) {
+         if(! -f "service.yml") {
+            print "No service.yml found.\n";
+            exit 1;
+         }
+
+         my $content = eval { local(@ARGV, $/) = ("service.yml"); <>; };
+         my $ref = Load($content);
+
+         my $name = $ref->{name};
+         delete $ref->{name};
+
+         my $ret = {};
+         eval {
+            $ret = $client->add_service($name, $ref);
+         };
+
+         if($@) {
+            print "Error adding new service.\n";
+            exit 1;
+         }
+
+         print "Service $service added.\n";
+         print Dump($ret);
+
          exit;
       }
 
@@ -260,6 +295,8 @@ Rex.IO is a server infrastructure around the Rex Framework. It will combine serv
 =item          --add                     add a new service to a server
 
 =item          --rm                      remove a service from a server
+
+=item          --register                register a new service. Reads values from service.yml.
 
 =item          --section=<section>       configure a section
 
