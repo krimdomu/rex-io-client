@@ -34,8 +34,9 @@ our $VERSION = "0.0.8";
 
 sub create {
 
-   my ($class, $version) = @_;
-   $version ||= "1";
+   my ($class, %option) = @_;
+
+   my $version = $option{protocol} || 1;
 
    my $klass = "Rex::IO::Client::Protocol::V$version";
    eval "use $klass";
