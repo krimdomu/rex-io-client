@@ -2,4 +2,19 @@
 
 =head2 Rex::IO::Client
 
-Work in progress...
+This is work in progress...
+
+=head2 EXAMPLE
+
+ use strict;
+ use warnings;
+ 
+ use Data::Dumper;
+ use Rex::IO::Client;
+ 
+ my $cl = Rex::IO::Client->create(1);
+ $cl->endpoint = "http://127.0.0.1:5000";
+ 
+ my $res = $cl->search_server("fo");
+ 
+ print Dumper($res);
