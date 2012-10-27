@@ -35,6 +35,21 @@ sub search_server {
    $self->_get("/hardware/search/$expr")->res->json;
 }
 
+sub get_server {
+   my ($self, $id) = @_;
+   $self->_get("/hardware/$id")->res->json;
+}
+
+sub list_os {
+   my ($self) = @_;
+   $self->_list("/os")->res->json;
+}
+
+sub list_os_templates {
+   my ($self) = @_;
+   $self->_list("/os-template")->res->json;
+}
+
 sub _ua {
    my ($self) = @_;
    return Mojo::UserAgent->new;
@@ -43,6 +58,12 @@ sub _ua {
 sub _get {
    my ($self, $url) = @_;
    $self->_ua->get($self->endpoint . $url);
+}
+
+sub _list {
+   my ($self, $url) = @_;
+   my $tx = $self->_ua->build_tx(LIST => $self->endpoint . $url);
+   $self->_ua->start($tx);
 }
 
 
