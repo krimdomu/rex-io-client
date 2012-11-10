@@ -50,6 +50,47 @@ sub list_os_templates {
    $self->_list("/os-template")->res->json;
 }
 
+sub set_next_boot {
+   my ($self, %option) = @_;
+
+   unless($option{boot} =~ m/^\d+$/) {
+      my $templates = $self->list_os_templates;
+      for my $t (@{ $templates }) {
+         if($t->{name} eq $option{boot}) {
+            $option{boot} = $t->{id};
+            last;
+         }
+      }
+   }
+
+   unless($option{server} =~ m/^\d+$/) {
+      my $server = $self->search_server($option{server});
+      $option{server} = $server->[0]->{id};
+   }
+
+   $self->_post("/hardware/$option{server}", {os_template_id => $option{boot}})->res->json;
+}
+
+sub get_dns_tlds {
+   my ($self) = @_;
+   $self->_list("/dns")->res->json;
+}
+
+sub get_dns_tld {
+   my ($self, $tld) = @_;
+   $self->_list("/dns/$tld")->res->json;
+}
+
+sub get_dhcp_leases {
+   my ($self) = @_;
+   $self->_list("/dhcp")->res->json;
+}
+
+sub get_deploy_oses {
+   my ($self) = @_;
+   $self->_list("/deploy/os")->res->json;
+}
+
 sub _ua {
    my ($self) = @_;
    return Mojo::UserAgent->new;
@@ -58,6 +99,11 @@ sub _ua {
 sub _get {
    my ($self, $url) = @_;
    $self->_ua->get($self->endpoint . $url);
+}
+
+sub _post {
+   my ($self, $url, $post) = @_;
+   $self->_ua->post_json($self->endpoint . $url, $post);
 }
 
 sub _list {
