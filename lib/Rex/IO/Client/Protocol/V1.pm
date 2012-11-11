@@ -11,6 +11,7 @@ use warnings;
 
 use attributes;
 
+use Mojo::JSON;
 use Mojo::UserAgent;
 
 sub new {
@@ -91,6 +92,11 @@ sub get_deploy_oses {
    $self->_list("/deploy/os")->res->json;
 }
 
+sub save_deploy_os {
+   my ($self, $id, %data) = @_;
+   $self->_put("/deploy/os/$id", { %data })->res->json;
+}
+
 sub _ua {
    my ($self) = @_;
    return Mojo::UserAgent->new;
@@ -106,10 +112,20 @@ sub _post {
    $self->_ua->post_json($self->endpoint . $url, $post);
 }
 
+sub _put {
+   my ($self, $url, $put) = @_;
+   $self->_ua->put($self->endpoint . $url, $self->_json->encode($put));
+}
+
 sub _list {
    my ($self, $url) = @_;
    my $tx = $self->_ua->build_tx(LIST => $self->endpoint . $url);
    $self->_ua->start($tx);
+}
+
+sub _json {
+   my ($self) = @_;
+   return Mojo::JSON->new;
 }
 
 
