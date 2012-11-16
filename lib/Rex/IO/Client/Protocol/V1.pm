@@ -46,6 +46,11 @@ sub list_os {
    $self->_list("/os")->res->json;
 }
 
+sub list_hosts {
+   my ($self) = @_;
+   $self->_list("/host")->res->json;
+}
+
 sub list_os_templates {
    my ($self) = @_;
    $self->_list("/os-template")->res->json;
