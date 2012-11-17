@@ -61,6 +61,11 @@ sub add_os_template {
    $self->_post("/os-template", { %option })->res->json;
 }
 
+sub update_network_adapter {
+   my ($self, $id, %option) = @_;
+   $self->_post("/network-adapter/$id", { %option })->res->json;
+}
+
 sub list_os_templates {
    my ($self) = @_;
    $self->_list("/os-template")->res->json;
