@@ -41,6 +41,11 @@ sub get_server {
    $self->_get("/hardware/$id")->res->json;
 }
 
+sub add_server {
+   my ($self, $mac, %option) = @_;
+   $self->_post("/host/$mac", { %option })->res->json;
+}
+
 sub list_os {
    my ($self) = @_;
    $self->_list("/os")->res->json;
@@ -49,6 +54,11 @@ sub list_os {
 sub list_hosts {
    my ($self) = @_;
    $self->_list("/host")->res->json;
+}
+
+sub add_os_template {
+   my ($self, %option) = @_;
+   $self->_post("/os-template", { %option })->res->json;
 }
 
 sub list_os_templates {
