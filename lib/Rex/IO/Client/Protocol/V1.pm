@@ -92,6 +92,11 @@ sub set_next_boot {
    $self->_post("/hardware/$option{server}", {os_template_id => $option{boot}})->res->json;
 }
 
+sub update_server {
+   my ($self, $srv_id, %option) = @_;
+   $self->_post("/hardware/$srv_id", \%option)->res->json;
+}
+
 sub get_dns_tlds {
    my ($self) = @_;
    $self->_list("/dns")->res->json;
