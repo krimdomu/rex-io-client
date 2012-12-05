@@ -5,7 +5,6 @@ use ExtUtils::MakeMaker;
 my %deps = (
                   'Mojolicious' => '2.98',
                   'YAML' => 0,
-                  'Rex' => '0.29'
 );
 
 WriteMakefile1(
@@ -17,13 +16,11 @@ WriteMakefile1(
    BUILD_REQUIRES => {
       'Mojolicious' => '2.98',
       'YAML' => 0,
-      'Rex' => '0.29',
    },
 
    NAME => 'Rex::IO::Client',
    VERSION_FROM => 'lib/Rex/IO/Client.pm',
    PREREQ_PM => \%deps,
-   EXE_FILES => ['bin/rex.io'],
    LICENSE => 'Apache License 2.0'
 );
 
