@@ -117,6 +117,17 @@ sub get_deploy_oses {
    $self->_list("/deploy/os")->res->json;
 }
 
+sub add_dns_A_record {
+   my ($self, $domain, $host, %option) = @_;
+   $option{record_type} = "A";
+   $self->_post("/dns/$domain/A/$host", \%option)->res->json;   
+}
+
+sub del_dns_A_record {
+   my ($self, $domain, $host) = @_;
+   $self->_delete("/dns/$domain/A/$host")->res->json;
+}
+
 sub save_deploy_os {
    my ($self, $id, %data) = @_;
    $self->_put("/deploy/os/$id", { %data })->res->json;
@@ -145,6 +156,12 @@ sub _put {
 sub _list {
    my ($self, $url) = @_;
    my $tx = $self->_ua->build_tx(LIST => $self->endpoint . $url);
+   $self->_ua->start($tx);
+}
+
+sub _delete {
+   my ($self, $url) = @_;
+   my $tx = $self->_ua->build_tx(DELETE => $self->endpoint . $url);
    $self->_ua->start($tx);
 }
 
