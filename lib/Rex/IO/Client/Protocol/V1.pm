@@ -117,15 +117,14 @@ sub get_deploy_oses {
    $self->_list("/deploy/os")->res->json;
 }
 
-sub add_dns_A_record {
+sub add_dns_record {
    my ($self, $domain, $host, %option) = @_;
-   $option{record_type} = "A";
-   $self->_post("/dns/$domain/A/$host", \%option)->res->json;   
+   $self->_post("/dns/$domain/$host", \%option)->res->json;   
 }
 
-sub del_dns_A_record {
-   my ($self, $domain, $host) = @_;
-   $self->_delete("/dns/$domain/A/$host")->res->json;
+sub del_dns_record {
+   my ($self, $domain, $host, $type) = @_;
+   $self->_delete("/dns/$domain/$type/$host")->res->json;
 }
 
 sub save_deploy_os {
