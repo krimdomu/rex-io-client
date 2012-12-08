@@ -71,6 +71,16 @@ sub list_os_templates {
    $self->_list("/os-template")->res->json;
 }
 
+sub list_online_ips {
+   my ($self) = @_;
+   $self->_list("/messagebroker/clients?only_ip=true")->res->json;
+}
+
+sub is_online {
+   my ($self, $ip) = @_;
+   $self->_get("/messagebroker/online/$ip")->res->json;
+}
+
 sub set_next_boot {
    my ($self, %option) = @_;
 
