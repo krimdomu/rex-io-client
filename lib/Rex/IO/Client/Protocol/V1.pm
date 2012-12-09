@@ -81,6 +81,11 @@ sub is_online {
    $self->_get("/messagebroker/online/$ip")->res->json;
 }
 
+sub trigger_inventory {
+   my ($self, $ip) = @_;
+   $self->_post("/messagebroker/$ip", {type => "inventory"})->res->json;
+}
+
 sub set_next_boot {
    my ($self, %option) = @_;
 
