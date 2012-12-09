@@ -86,6 +86,11 @@ sub trigger_inventory {
    $self->_post("/messagebroker/$ip", {type => "inventory"})->res->json;
 }
 
+sub trigger_reboot {
+   my ($self, $ip) = @_;
+   $self->_post("/messagebroker/$ip", {type => "exec", exec => "/sbin/reboot"})->res->json;
+}
+
 sub set_next_boot {
    my ($self, %option) = @_;
 
