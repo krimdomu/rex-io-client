@@ -159,7 +159,15 @@ sub save_deploy_os {
 
 sub _ua {
    my ($self) = @_;
-   return Mojo::UserAgent->new;
+   my $ua = Mojo::UserAgent->new;
+
+   if($self->{ssl}) {
+      $ua->ca($self->{ssl}->{ca});
+      $ua->cert($self->{ssl}->{cert});
+      $ua->key($self->{ssl}->{key});
+   }
+
+   return $ua;
 }
 
 sub _get {

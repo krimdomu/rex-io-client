@@ -45,7 +45,7 @@ sub create {
       die("Protocol Version $version not found.");
    }
 
-   return $klass->new;
+   return $klass->new(%option);
 }
 
 
