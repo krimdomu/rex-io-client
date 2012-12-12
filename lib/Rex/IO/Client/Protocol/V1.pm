@@ -46,6 +46,11 @@ sub add_server {
    $self->_post("/host/$mac", { %option })->res->json;
 }
 
+sub get_plugins {
+   my ($self) = @_;
+   $self->_get("/plugins")->res->json;
+}
+
 sub list_os {
    my ($self) = @_;
    $self->_list("/os")->res->json;
