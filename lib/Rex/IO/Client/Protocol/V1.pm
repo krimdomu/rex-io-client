@@ -13,6 +13,7 @@ use attributes;
 
 use Mojo::JSON;
 use Mojo::UserAgent;
+use Data::Dumper;
 
 sub new {
    my $that = shift;
@@ -24,6 +25,29 @@ sub new {
    $self->{endpoint} ||= "http://127.0.0.1:3000";
 
    return $self;
+}
+
+sub auth {
+   my ($self, $user, $pass) = @_;
+   $self->{username} = $user;
+   $self->{password} = $pass;
+
+   my $data = $self->_post("/auth", {user => $user, password => $pass})->res->json;
+
+   if($data->{ok} == Mojo::JSON->true) {
+      return $data->{data};
+   }
+
+   return;
+}
+
+sub get_user {
+   my ($self, $id) = @_;
+   my $ret = $self->_get("/user/$id")->res->json;
+   if($ret->{ok} == Mojo::JSON->true) {
+      return $ret->{data};
+   }
+   return;
 }
 
 sub endpoint :lvalue {
@@ -159,6 +183,10 @@ sub save_deploy_os {
 
 sub _ua {
    my ($self) = @_;
+   if($self->{ua}) {
+      return $self->{ua};
+   }
+
    my $ua = Mojo::UserAgent->new;
 
    if($self->{ssl}) {
@@ -167,7 +195,8 @@ sub _ua {
       $ua->key($self->{ssl}->{key});
    }
 
-   return $ua;
+   $self->{ua} = $ua;
+   return $self->{ua};
 }
 
 sub _get {
