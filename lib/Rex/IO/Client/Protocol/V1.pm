@@ -105,6 +105,31 @@ sub list_online_ips {
    $self->_list("/messagebroker/clients?only_ip=true")->res->json;
 }
 
+sub list_services {
+   my ($self) = @_;
+   $self->_list("/service")->res->json;
+}
+
+sub get_service {
+   my ($self, $service) = @_;
+   $self->_list("/service/$service")->res->json;
+}
+
+sub add_service_to_host {
+   my ($self, %option) = @_;
+   $self->_post("/service/host/" . $option{host} . "/task/" . $option{task}, {})->res->json;
+}
+
+sub run_service_on_host {
+   my ($self, %option) = @_;
+   $self->_run("/service/host/" . $option{host} . "/task/" . $option{task})->res->json;
+}
+
+sub list_services_of_host {
+   my ($self, $host) = @_;
+   $self->_list("/service/host/$host")->res->json;
+}
+
 sub is_online {
    my ($self, $ip) = @_;
    $self->_get("/messagebroker/online/$ip")->res->json;
@@ -206,7 +231,7 @@ sub _get {
 
 sub _post {
    my ($self, $url, $post) = @_;
-   $self->_ua->post_json($self->endpoint . $url, $post);
+   $self->_ua->post($self->endpoint . $url, json => $post);
 }
 
 sub _put {
@@ -217,6 +242,12 @@ sub _put {
 sub _list {
    my ($self, $url) = @_;
    my $tx = $self->_ua->build_tx(LIST => $self->endpoint . $url);
+   $self->_ua->start($tx);
+}
+
+sub _run {
+   my ($self, $url) = @_;
+   my $tx = $self->_ua->build_tx(RUN => $self->endpoint . $url);
    $self->_ua->start($tx);
 }
 
