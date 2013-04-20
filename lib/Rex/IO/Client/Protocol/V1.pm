@@ -115,14 +115,19 @@ sub get_service {
    $self->_list("/service/$service")->res->json;
 }
 
-sub add_service_to_host {
+sub add_task_to_host {
    my ($self, %option) = @_;
-   $self->_post("/service/host/" . $option{host} . "/task/" . $option{task}, {})->res->json;
+   $self->_post("/service/host/" . $option{host} . "/task/" . $option{task}, {task_order => ($option{task_order} || 0)})->res->json;
 }
 
-sub run_service_on_host {
+sub run_task_on_host {
    my ($self, %option) = @_;
    $self->_run("/service/host/" . $option{host} . "/task/" . $option{task})->res->json;
+}
+
+sub remove_all_tasks_from_host {
+   my ($self, $host) = @_;
+   $self->_delete("/service/host/$host")->res->json;
 }
 
 sub list_services_of_host {
