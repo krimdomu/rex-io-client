@@ -120,6 +120,11 @@ sub add_task_to_host {
    $self->_post("/service/host/" . $option{host} . "/task/" . $option{task}, {task_order => ($option{task_order} || 0)})->res->json;
 }
 
+sub run_tasks {
+   my ($self, @tasks) = @_;
+   $self->_run("/service", \@tasks)->res->json;
+}
+
 sub run_task_on_host {
    my ($self, %option) = @_;
    $self->_run("/service/host/" . $option{host} . "/task/" . $option{task})->res->json;
@@ -251,8 +256,10 @@ sub _list {
 }
 
 sub _run {
-   my ($self, $url) = @_;
-   my $tx = $self->_ua->build_tx(RUN => $self->endpoint . $url);
+   my ($self, $url, $obj) = @_;
+   $obj ||= {};
+
+   my $tx = $self->_ua->build_tx(RUN => $self->endpoint . $url, json => $obj);
    $self->_ua->start($tx);
 }
 
