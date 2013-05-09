@@ -155,6 +155,11 @@ sub trigger_reboot {
    $self->_post("/messagebroker/$ip", {type => "exec", exec => "/sbin/reboot"})->res->json;
 }
 
+sub send_command_to {
+   my ($self, $ip, $command) = @_;
+   $self->_post("/messagebroker/$ip", $command)->res->json;
+}
+
 sub set_next_boot {
    my ($self, %option) = @_;
 
