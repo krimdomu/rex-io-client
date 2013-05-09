@@ -216,6 +216,11 @@ sub save_deploy_os {
    $self->_put("/deploy/os/$id", { %data })->res->json;
 }
 
+sub get_monitoring_items_of_host {
+   my ($self, $host_id) = @_;
+   $self->_list("/monitor/host/$host_id/item")->res->json;
+}
+
 sub _ua {
    my ($self) = @_;
    if($self->{ua}) {
