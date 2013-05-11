@@ -251,6 +251,26 @@ sub get_operating_systems {
    $self->_count("/host/os")->res->json;
 }
 
+sub add_server_group {
+   my ($self, %option) = @_;
+   $self->_post("/server_group", \%option)->res->json;
+}
+
+sub del_server_group {
+   my ($self, $group_id) = @_;
+   $self->_delete("/server_group/$group_id")->res->json;
+}
+
+sub list_server_groups {
+   my ($self) = @_;
+   $self->_list("/server_group")->res->json;
+}
+
+sub add_server_to_server_group {
+   my ($self, $server_id, $group_id) = @_;
+   $self->_post("/server_group/server/$server_id/$group_id")->res->json;
+}
+
 sub _ua {
    my ($self) = @_;
    if($self->{ua}) {
