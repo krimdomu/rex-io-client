@@ -160,6 +160,16 @@ sub send_command_to {
    $self->_post("/messagebroker/$ip", $command)->res->json;
 }
 
+sub list_alerts {
+   my ($self) = @_;
+   $self->_list("/monitor/alerts")->res->json;
+}
+
+sub list_alerts_of_host {
+   my ($self, $host_id) = @_;
+   $self->_list("/monitor/alerts/$host_id")->res->json;
+}
+
 sub set_next_boot {
    my ($self, %option) = @_;
 
@@ -226,6 +236,21 @@ sub get_monitoring_items_of_host {
    $self->_list("/monitor/host/$host_id/item")->res->json;
 }
 
+sub get_log_of_host {
+   my ($self, $host_id, %opt) = @_;
+   $self->_post("/log/server/$host_id", \%opt)->res->json;
+}
+
+sub get_server_count {
+   my ($self) = @_;
+   $self->_count("/host")->res->json;
+}
+
+sub get_operating_systems {
+   my ($self) = @_;
+   $self->_count("/host/os")->res->json;
+}
+
 sub _ua {
    my ($self) = @_;
    if($self->{ua}) {
@@ -276,6 +301,12 @@ sub _run {
 sub _delete {
    my ($self, $url) = @_;
    my $tx = $self->_ua->build_tx(DELETE => $self->endpoint . $url);
+   $self->_ua->start($tx);
+}
+
+sub _count {
+   my ($self, $url) = @_;
+   my $tx = $self->_ua->build_tx(COUNT => $self->endpoint . $url);
    $self->_ua->start($tx);
 }
 
