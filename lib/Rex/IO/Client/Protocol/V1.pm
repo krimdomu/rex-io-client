@@ -50,6 +50,58 @@ sub get_user {
    return;
 }
 
+sub get_group {
+   my ($self, $id) = @_;
+   my $ret = $self->_get("/group/$id")->res->json;
+   if($ret->{ok} == Mojo::JSON->true) {
+      return $ret->{data};
+   }
+   return;
+}
+
+sub list_users {
+   my ($self) = @_;
+   my $ret = $self->_list("/user")->res->json;
+   if($ret->{ok} == Mojo::JSON->true) {
+      return $ret->{data};
+   }
+   return;
+}
+
+sub list_groups {
+   my ($self) = @_;
+   my $ret = $self->_list("/group")->res->json;
+   if($ret->{ok} == Mojo::JSON->true) {
+      return $ret->{data};
+   }
+   return;
+}
+
+sub add_user {
+   my ($self, %option) = @_;
+   $self->_post("/user", \%option)->res->json;
+}
+
+sub add_group {
+   my ($self, %option) = @_;
+   $self->_post("/group", \%option)->res->json;
+}
+
+sub del_user {
+   my ($self, $user_id) = @_;
+   $self->_delete("/user/$user_id")->res->json;
+}
+
+sub del_group {
+   my ($self, $group_id) = @_;
+   $self->_delete("/group/$group_id")->res->json;
+}
+
+sub add_user_to_group {
+   my ($self, $user_id, $group_id) = @_;
+   $self->_post("/group/$group_id/user/$user_id")->res->json;
+}
+
 sub endpoint :lvalue {
    my ($self) = @_;
    $self->{endpoint};
