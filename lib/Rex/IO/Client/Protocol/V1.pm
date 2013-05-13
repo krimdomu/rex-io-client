@@ -102,6 +102,59 @@ sub add_user_to_group {
    $self->_post("/group/$group_id/user/$user_id")->res->json;
 }
 
+sub add_incident {
+   my ($self, %option) = @_;
+   $self->_post("/incident", \%option)->res->json;
+}
+
+sub update_incident_status {
+   my ($self, $incident_id, $status_id) = @_;
+   $self->_post("/incident/$incident_id/status", { status_id => $status_id })->res->json;
+}
+
+sub add_incident_message {
+   my ($self, $incident_id, %option) = @_;
+   $self->_post("/incident/$incident_id/message", \%option)->res->json;
+}
+
+sub list_incidents {
+   my ($self) = @_;
+   my $res = $self->_list("/incident")->res->json;
+
+   if($res->{ok} == Mojo::JSON->true) {
+      return $res->{data};
+   }
+   return;
+}
+
+sub list_incident_messages {
+   my ($self, $incident_id) = @_;
+   my $res = $self->_list("/incident/$incident_id/message")->res->json;
+   
+   if($res->{ok} == Mojo::JSON->true) {
+      return $res->{data};
+   }
+
+   return;
+}
+
+sub get_incident {
+   my ($self, $incident_id) = @_;
+   $self->_get("/incident/$incident_id")->res->json;
+}
+
+sub list_incident_status {
+   my ($self) = @_;
+
+   my $res = $self->_list("/incident/status")->res->json;
+   
+   if($res->{ok} == Mojo::JSON->true) {
+      return $res->{data};
+   }
+
+   return;
+}
+
 sub endpoint :lvalue {
    my ($self) = @_;
    $self->{endpoint};
