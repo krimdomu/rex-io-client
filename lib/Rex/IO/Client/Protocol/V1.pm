@@ -376,6 +376,73 @@ sub add_server_to_server_group {
    $self->_post("/server_group/server/$server_id/$group_id")->res->json;
 }
 
+sub list_monitoring_templates {
+   my ($self) = @_;
+   my $data = $self->_list("/monitor/template")->res->json;
+
+   if($data->{ok} == Mojo::JSON->true) {
+      return $data->{data};
+   }
+}
+
+sub add_monitoring_template {
+   my ($self, %option) = @_;
+   $self->_post("/monitor/template", \%option)->res->json;
+}
+
+sub del_monitoring_template {
+   my ($self, $id) = @_;
+   $self->_delete("/monitor/template/$id")->res->json;
+}
+
+sub add_monitoring_item {
+   my ($self, $template_id, %option) = @_;
+   $self->_post("/monitor/template/$template_id/item", \%option)->res->json;
+}
+
+sub del_monitoring_item {
+   my ($self, $template_id, $item_id) = @_;
+   $self->_delete("/monitor/template/$template_id/item/$item_id")->res->json;
+}
+
+sub list_monitoring_item_of_template {
+   my ($self, $template_id) = @_;
+   my $data = $self->_list("/monitor/template/$template_id")->res->json;
+
+   if($data->{ok} == Mojo::JSON->true) {
+      return $data->{data};
+   }
+}
+
+sub get_monitoring_template {
+   my ($self, $template_id) = @_;
+   my $data = $self->_get("/monitor/template/$template_id")->res->json;
+
+   if($data->{ok} == Mojo::JSON->true) {
+      return $data->{data};
+   }
+}
+
+sub get_monitoring_item {
+   my ($self, $template_id, $item_id) = @_;
+   my $data = $self->_get("/monitor/template/$template_id/item/$item_id")->res->json;
+
+   if($data->{ok} == Mojo::JSON->true) {
+      return $data->{data};
+   }
+}
+
+sub update_monitoring_item {
+   my ($self, $template_id, $item_id, %option) = @_;
+   $self->_post("/monitor/template/$template_id/item/$item_id", \%option)->res->json;
+}
+
+sub add_monitoring_template_to_host {
+   my ($self, $template_id, $host_id) = @_;
+   $self->_post("/monitor/template/$template_id/host/$host_id")->res->json;
+}
+
+
 sub _ua {
    my ($self) = @_;
    if($self->{ua}) {
