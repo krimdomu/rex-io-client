@@ -3,7 +3,7 @@
 use ExtUtils::MakeMaker;
 
 my %deps = (
-                  'Mojolicious' => '2.98',
+                  'Mojolicious' => '3.90',
                   'YAML' => 0,
 );
 
@@ -12,10 +12,6 @@ WriteMakefile1(
       resources => {
          repository => 'https://github.com/krimdomu/rex-io-client',
       },
-   },
-   BUILD_REQUIRES => {
-      'Mojolicious' => '2.98',
-      'YAML' => 0,
    },
 
    NAME => 'Rex::IO::Client',
