@@ -507,5 +507,28 @@ sub _json {
    return Mojo::JSON->new;
 }
 
+## new urls
+# $VERB /1.0/plugin/resource/id
+# GET /1.0/hardware/server/5   -> get hardware id 5
+# GET /1.0/hardware/server    -> get hardware list
+
+sub call {
+   my ($self, $verb, $version, $plugin, $resource, $id, $ref) = @_;
+
+   my $meth = "_\l$verb";
+
+   if(ref $ref) {
+      $self->$meth("/$version/$plugin/$resource/$id", $ref);
+   }
+   elsif(ref $id) {
+      # id is the data
+      $self->$meth("/$version/$plugin/$resource", $id);
+   }
+   else {
+      # there is no data and no id
+      $self->$meth("/$version/$plugin/$resource");
+   }
+}
+
 
 1;
