@@ -175,6 +175,11 @@ sub add_server {
    $self->_post("/host/$mac", { %option })->res->json;
 }
 
+sub del_server {
+   my ($self, $srv_id) = @_;
+   $self->_delete("/hardware/$srv_id")->res->json;
+}
+
 sub get_plugins {
    my ($self) = @_;
    $self->_get("/plugins")->res->json;
