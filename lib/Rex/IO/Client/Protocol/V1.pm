@@ -520,19 +520,26 @@ sub _json {
 sub call {
    my ($self, $verb, $version, $plugin, $resource, $id, $ref) = @_;
 
-   my $meth = "_\l$verb";
+   my $meth = "_\L$verb";
+
+   my $ret;
 
    if(ref $ref) {
-      $self->$meth("/$version/$plugin/$resource/$id", $ref);
+      $ret = $self->$meth("/$version/$plugin/$resource/$id", $ref);
    }
    elsif(ref $id) {
       # id is the data
-      $self->$meth("/$version/$plugin/$resource", $id);
+      $ret = $self->$meth("/$version/$plugin/$resource", $id);
+   }
+   elsif(! ref $id && defined $id) {
+      $ret = $self->$meth("/$version/$plugin/$resource/$id");
    }
    else {
       # there is no data and no id
-      $self->$meth("/$version/$plugin/$resource");
+      $ret = $self->$meth("/$version/$plugin/$resource");
    }
+
+   return $ret->res->json;
 }
 
 
