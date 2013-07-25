@@ -175,6 +175,11 @@ sub add_server {
    $self->_post("/host/$mac", { %option })->res->json;
 }
 
+sub del_server {
+   my ($self, $srv_id) = @_;
+   $self->_delete("/hardware/$srv_id")->res->json;
+}
+
 sub get_plugins {
    my ($self) = @_;
    $self->_get("/plugins")->res->json;
@@ -482,6 +487,12 @@ sub _list {
    $self->_ua->start($tx);
 }
 
+sub _info {
+   my ($self, $url) = @_;
+   my $tx = $self->_ua->build_tx(INFO => $self->endpoint . $url);
+   $self->_ua->start($tx);
+}
+
 sub _run {
    my ($self, $url, $obj) = @_;
    $obj ||= {};
@@ -508,26 +519,44 @@ sub _json {
 }
 
 ## new urls
-# $VERB /1.0/plugin/resource/id
+# $VERB /1.0/plugin/resource/subres/id
 # GET /1.0/hardware/server/5   -> get hardware id 5
 # GET /1.0/hardware/server    -> get hardware list
 
 sub call {
-   my ($self, $verb, $version, $plugin, $resource, $id, $ref) = @_;
+   my ($self, $verb, $version, $plugin, @param) = @_;
 
-   my $meth = "_\l$verb";
+   my $url = "/$version/$plugin";
+
+   my $ref;
+
+   #for my $key (@param) {
+   while(my $key = shift @param) {
+      my $value = shift @param;
+      if($key eq "ref") {
+         $ref = $value;
+         next;
+      }
+
+      $url .= "/$key";
+
+      if(defined $value) {
+         $url .= "/$value";
+      }
+   }
+
+   my $meth = "_\L$verb";
+
+   my $ret;
 
    if(ref $ref) {
-      $self->$meth("/$version/$plugin/$resource/$id", $ref);
-   }
-   elsif(ref $id) {
-      # id is the data
-      $self->$meth("/$version/$plugin/$resource", $id);
+      $ret = $self->$meth($url, $ref);
    }
    else {
-      # there is no data and no id
-      $self->$meth("/$version/$plugin/$resource");
+      $ret = $self->$meth($url);
    }
+
+   return $ret->res->json;
 }
 
 
