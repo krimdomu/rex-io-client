@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = "0.0.8";
+our $VERSION = "0.2.7";
 
 sub create {
 
@@ -42,7 +42,7 @@ sub create {
    eval "use $klass";
 
    if($@) {
-      die("Protocol Version $version not found.");
+      die("Protocol Version $version not found. $@");
    }
 
    return $klass->new(%option);

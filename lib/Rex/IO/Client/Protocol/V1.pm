@@ -14,6 +14,7 @@ use attributes;
 use Mojo::JSON;
 use Mojo::UserAgent;
 use Data::Dumper;
+use Redis;
 
 sub new {
    my $that = shift;
@@ -23,6 +24,7 @@ sub new {
    bless($self, $proto);
 
    $self->{endpoint} ||= "http://127.0.0.1:3000";
+   $self->{redis} = Redis->new(server => "127.0.0.1:6379");
 
    return $self;
 }
@@ -523,11 +525,19 @@ sub _json {
 # GET /1.0/hardware/server/5   -> get hardware id 5
 # GET /1.0/hardware/server    -> get hardware list
 
-sub call {
+sub clear_call_cache {
+   my ($self, $key) = @_;
+
+   my @keys = $self->{redis}->keys("rexioclient:$key");
+   for my $key (@keys) {
+      $self->{redis}->del($key);
+   }
+}
+
+sub call_no_cache {
    my ($self, $verb, $version, $plugin, @param) = @_;
 
    my $url = "/$version/$plugin";
-
    my $ref;
 
    #for my $key (@param) {
@@ -554,6 +564,65 @@ sub call {
    }
    else {
       $ret = $self->$meth($url);
+   }
+
+   return $ret->res->json;
+}
+
+sub call {
+   my ($self, $verb, $version, $plugin, @param) = @_;
+
+   my @param_clean = grep { defined $_ && ! ref $_ } @param;
+   my $key = "rexioclient:$verb:$version:$plugin:" . join(":", @param_clean);
+
+   my $url = "/$version/$plugin";
+
+   my $ref;
+
+   if($verb eq "POST" || $verb eq "PUT" || $verb eq "DELETE") {
+      my $__tmp = { @param };
+      if(exists $__tmp->{server}) {
+         my @keys = $self->{redis}->keys('rexioclient:*:server:' . $__tmp->{server} . ':*');
+         map { $self->{redis}->del($_); } @keys;
+      }
+   }
+
+   if($verb eq "GET" || $verb eq "LIST" || $verb eq "INFO") {
+      my $redis_ret = $self->{redis}->get($key);
+      if($redis_ret) {
+         return Mojo::JSON->decode($redis_ret);
+      }
+   }
+
+   #for my $key (@param) {
+   while(my $key = shift @param) {
+      my $value = shift @param;
+      if($key eq "ref") {
+         $ref = $value;
+         next;
+      }
+
+      $url .= "/$key";
+
+      if(defined $value) {
+         $url .= "/$value";
+      }
+   }
+
+   my $meth = "_\L$verb";
+
+   my $ret;
+
+   if(ref $ref) {
+      $ret = $self->$meth($url, $ref);
+   }
+   else {
+      $ret = $self->$meth($url);
+   }
+
+   if($verb eq "GET" || $verb eq "LIST" || $verb eq "INFO") {
+      $self->{redis}->set($key, Mojo::JSON->encode($ret->res->json));
+      $self->{redis}->expireat($key, time + 180);
    }
 
    return $ret->res->json;
