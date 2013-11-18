@@ -11,10 +11,11 @@ use warnings;
 
 use attributes;
 
-use Mojo::JSON;
+use JSON::XS;
 use Mojo::UserAgent;
 use Data::Dumper;
 use Redis;
+use Mojo::JSON;
 
 sub new {
    my $that = shift;
@@ -34,9 +35,9 @@ sub auth {
    $self->{username} = $user;
    $self->{password} = $pass;
 
-   my $data = $self->_post("/auth", {user => $user, password => $pass})->res->json;
+   my $data = decode_json($self->_post("/auth", {user => $user, password => $pass})->res->body);
 
-   if($data->{ok} == Mojo::JSON->true) {
+   if($data->{ok}) {
       return $data->{data};
    }
 
@@ -45,8 +46,8 @@ sub auth {
 
 sub get_user {
    my ($self, $id) = @_;
-   my $ret = $self->_get("/user/$id")->res->json;
-   if($ret->{ok} == Mojo::JSON->true) {
+   my $ret = decode_json($self->_get("/user/$id")->res->body);
+   if($ret->{ok}) {
       return $ret->{data};
    }
    return;
@@ -54,8 +55,8 @@ sub get_user {
 
 sub get_group {
    my ($self, $id) = @_;
-   my $ret = $self->_get("/group/$id")->res->json;
-   if($ret->{ok} == Mojo::JSON->true) {
+   my $ret = decode_json($self->_get("/group/$id")->res->body);
+   if($ret->{ok}) {
       return $ret->{data};
    }
    return;
@@ -63,8 +64,8 @@ sub get_group {
 
 sub list_users {
    my ($self) = @_;
-   my $ret = $self->_list("/user")->res->json;
-   if($ret->{ok} == Mojo::JSON->true) {
+   my $ret = decode_json($self->_list("/user")->res->body);
+   if($ret->{ok}) {
       return $ret->{data};
    }
    return;
@@ -72,8 +73,8 @@ sub list_users {
 
 sub list_groups {
    my ($self) = @_;
-   my $ret = $self->_list("/group")->res->json;
-   if($ret->{ok} == Mojo::JSON->true) {
+   my $ret = decode_json($self->_list("/group")->res->body);
+   if($ret->{ok}) {
       return $ret->{data};
    }
    return;
@@ -121,9 +122,9 @@ sub add_incident_message {
 
 sub list_incidents {
    my ($self) = @_;
-   my $res = $self->_list("/incident")->res->json;
+   my $res = decode_json($self->_list("/incident")->res->body);
 
-   if($res->{ok} == Mojo::JSON->true) {
+   if($res->{ok}) {
       return $res->{data};
    }
    return;
@@ -131,9 +132,9 @@ sub list_incidents {
 
 sub list_incident_messages {
    my ($self, $incident_id) = @_;
-   my $res = $self->_list("/incident/$incident_id/message")->res->json;
+   my $res = decode_json($self->_list("/incident/$incident_id/message")->res->body);
    
-   if($res->{ok} == Mojo::JSON->true) {
+   if($res->{ok}) {
       return $res->{data};
    }
 
@@ -148,9 +149,9 @@ sub get_incident {
 sub list_incident_status {
    my ($self) = @_;
 
-   my $res = $self->_list("/incident/status")->res->json;
+   my $res = decode_json($self->_list("/incident/status")->res->body);
    
-   if($res->{ok} == Mojo::JSON->true) {
+   if($res->{ok}) {
       return $res->{data};
    }
 
@@ -169,7 +170,7 @@ sub search_server {
 
 sub get_server {
    my ($self, $id) = @_;
-   $self->_get("/hardware/$id")->res->json;
+   decode_json($self->_get("/hardware/$id")->res->body);
 }
 
 sub add_server {
@@ -194,7 +195,7 @@ sub list_os {
 
 sub list_hosts {
    my ($self) = @_;
-   $self->_list("/host")->res->json;
+   decode_json($self->_list("/host")->res->body);
 }
 
 sub add_os_template {
@@ -385,9 +386,9 @@ sub add_server_to_server_group {
 
 sub list_monitoring_templates {
    my ($self) = @_;
-   my $data = $self->_list("/monitor/template")->res->json;
+   my $data = decode_json($self->_list("/monitor/template")->res->body);
 
-   if($data->{ok} == Mojo::JSON->true) {
+   if($data->{ok}) {
       return $data->{data};
    }
 }
@@ -414,27 +415,27 @@ sub del_monitoring_item {
 
 sub list_monitoring_item_of_template {
    my ($self, $template_id) = @_;
-   my $data = $self->_list("/monitor/template/$template_id")->res->json;
+   my $data = decode_json($self->_list("/monitor/template/$template_id")->res->body);
 
-   if($data->{ok} == Mojo::JSON->true) {
+   if($data->{ok}) {
       return $data->{data};
    }
 }
 
 sub get_monitoring_template {
    my ($self, $template_id) = @_;
-   my $data = $self->_get("/monitor/template/$template_id")->res->json;
+   my $data = decode_json($self->_get("/monitor/template/$template_id")->res->body);
 
-   if($data->{ok} == Mojo::JSON->true) {
+   if($data->{ok}) {
       return $data->{data};
    }
 }
 
 sub get_monitoring_item {
    my ($self, $template_id, $item_id) = @_;
-   my $data = $self->_get("/monitor/template/$template_id/item/$item_id")->res->json;
+   my $data = decode_json($self->_get("/monitor/template/$template_id/item/$item_id")->res->body);
 
-   if($data->{ok} == Mojo::JSON->true) {
+   if($data->{ok}) {
       return $data->{data};
    }
 }
@@ -566,7 +567,7 @@ sub call_no_cache {
       $ret = $self->$meth($url);
    }
 
-   return $ret->res->json;
+   return decode_json($ret->res->body);
 }
 
 sub call {
@@ -590,7 +591,7 @@ sub call {
    if($verb eq "GET" || $verb eq "LIST" || $verb eq "INFO") {
       my $redis_ret = $self->{redis}->get($key);
       if($redis_ret) {
-         return Mojo::JSON->decode($redis_ret);
+         return decode_json($redis_ret);
       }
    }
 
@@ -621,11 +622,11 @@ sub call {
    }
 
    if($verb eq "GET" || $verb eq "LIST" || $verb eq "INFO") {
-      $self->{redis}->set($key, Mojo::JSON->encode($ret->res->json));
+      $self->{redis}->set($key, $ret->res->body);
       $self->{redis}->expireat($key, time + 180);
    }
 
-   return $ret->res->json;
+   return decode_json($ret->res->body);
 }
 
 
