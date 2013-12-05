@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = "0.2.8";
+our $VERSION = "0.2.9";
 
 sub create {
 
