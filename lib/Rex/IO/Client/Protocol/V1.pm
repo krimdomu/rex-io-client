@@ -194,8 +194,10 @@ sub list_os {
 }
 
 sub list_hosts {
-   my ($self) = @_;
-   decode_json($self->_list("/host")->res->body);
+   my ($self, $qry) = @_;
+   $qry ||= "";
+
+   decode_json($self->_list("/host?$qry")->res->body);
 }
 
 sub add_os_template {
