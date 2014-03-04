@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 my %deps = (
                   'Mojolicious' => '3.90',
                   'YAML' => 0,
+                  'Redis' => 0,
 );
 
 WriteMakefile1(
