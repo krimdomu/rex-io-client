@@ -1,9 +1,9 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
-# 
+#
 # vim: set ts=3 sw=3 tw=0:
 # vim: set expandtab:
-   
+
 package Rex::IO::Client::Protocol::V1;
 
 use strict;
@@ -133,7 +133,7 @@ sub list_incidents {
 sub list_incident_messages {
    my ($self, $incident_id) = @_;
    my $res = decode_json($self->_list("/incident/$incident_id/message")->res->body);
-   
+
    if($res->{ok}) {
       return $res->{data};
    }
@@ -150,7 +150,7 @@ sub list_incident_status {
    my ($self) = @_;
 
    my $res = decode_json($self->_list("/incident/status")->res->body);
-   
+
    if($res->{ok}) {
       return $res->{data};
    }
@@ -333,7 +333,7 @@ sub get_deploy_oses {
 
 sub add_dns_record {
    my ($self, $domain, $host, %option) = @_;
-   $self->_post("/dns/$domain/$host", \%option)->res->json;   
+   $self->_post("/dns/$domain/$host", \%option)->res->json;
 }
 
 sub del_dns_record {
@@ -528,74 +528,12 @@ sub _json {
 # GET /1.0/hardware/server/5   -> get hardware id 5
 # GET /1.0/hardware/server    -> get hardware list
 
-sub clear_call_cache {
-   my ($self, $key) = @_;
-
-   my @keys = $self->{redis}->keys("rexioclient:$key");
-   for my $key (@keys) {
-      $self->{redis}->del($key);
-   }
-}
-
-sub call_no_cache {
-   my ($self, $verb, $version, $plugin, @param) = @_;
-
-   my $url = "/$version/$plugin";
-   my $ref;
-
-   #for my $key (@param) {
-   while(my $key = shift @param) {
-      my $value = shift @param;
-      if($key eq "ref") {
-         $ref = $value;
-         next;
-      }
-
-      $url .= "/$key";
-
-      if(defined $value) {
-         $url .= "/$value";
-      }
-   }
-
-   my $meth = "_\L$verb";
-
-   my $ret;
-
-   if(ref $ref) {
-      $ret = $self->$meth($url, $ref);
-   }
-   else {
-      $ret = $self->$meth($url);
-   }
-
-   return decode_json($ret->res->body);
-}
 
 sub call {
    my ($self, $verb, $version, $plugin, @param) = @_;
 
-   my @param_clean = grep { defined $_ && ! ref $_ } @param;
-   my $key = "rexioclient:$verb:$version:$plugin:" . join(":", @param_clean);
-
    my $url = "/$version/$plugin";
-
    my $ref;
-
-   if($verb eq "POST" || $verb eq "PUT" || $verb eq "DELETE") {
-      my $__tmp = { @param };
-      if(exists $__tmp->{server}) {
-         my @keys = $self->{redis}->keys('rexioclient:*:server:' . $__tmp->{server} . ':*');
-         map { $self->{redis}->del($_); } @keys;
-      }
-   }
-
-   if($verb eq "GET" || $verb eq "LIST" || $verb eq "INFO") {
-      my $redis_ret = $self->{redis}->get($key);
-      if($redis_ret) {
-         return decode_json($redis_ret);
-      }
-   }
 
    #for my $key (@param) {
    while(my $key = shift @param) {
@@ -623,13 +561,7 @@ sub call {
       $ret = $self->$meth($url);
    }
 
-   if($verb eq "GET" || $verb eq "LIST" || $verb eq "INFO") {
-      $self->{redis}->set($key, $ret->res->body);
-      $self->{redis}->expireat($key, time + 180);
-   }
-
    return decode_json($ret->res->body);
 }
-
 
 1;
