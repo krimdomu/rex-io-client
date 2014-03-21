@@ -30,17 +30,17 @@ sub new {
 
 sub auth {
   my ( $self, $user, $pass ) = @_;
-  $self->{username} = $user;
-  $self->{password} = $pass;
+  my ( $proto, $endpoint ) =
+    ( $self->{endpoint} =~ m/^(https?:\/\/).*\@(.*)$/ );
 
-  my $data = decode_json(
-    $self->_post( "/auth", { user => $user, password => $pass } )->res->body );
+  my $ref = $self->_ua->post( "$proto$user:$pass\@$endpoint/1.0/user/login",
+    json => {} )->res->json;
 
-  if ( $data->{ok} ) {
-    return $data->{data};
+  if ( $ref->{ok} == Mojo::JSON->true ) {
+    return $ref->{data};
   }
 
-  return;
+  return 0;
 }
 
 sub get_user {
