@@ -482,7 +482,18 @@ sub _ua {
 }
 
 sub _get {
-  my ( $self, $url ) = @_;
+  my ( $self, $url, $qry_string_ref ) = @_;
+
+  if ( ref $qry_string_ref ) {
+    $url .= "?";
+    for my $key ( keys %{$qry_string_ref} ) {
+      $url .= "\&$key=$qry_string_ref->{$key}";
+    }
+  }
+  elsif ($qry_string_ref) {
+    $url .= "?$qry_string_ref";
+  }
+
   $self->_ua->get( $self->endpoint . $url );
 }
 
@@ -564,6 +575,9 @@ sub call {
   my $ret;
 
   if ( ref $ref ) {
+    $ret = $self->$meth( $url, $ref );
+  }
+  elsif ($ref) {
     $ret = $self->$meth( $url, $ref );
   }
   else {
